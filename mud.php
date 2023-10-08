@@ -9,7 +9,6 @@ include_once('class.entity.php');
 
 include_once('class.game.php');
 
-
 class my_game {
     // private $stdin;
     // private $stdout;
@@ -27,9 +26,6 @@ class my_game {
         // public $c_entity; // this player entity in c_entities array // use this to ref main player
         public $c_entities; // 
         public $c_game;
-
-
-    //private $c_sockets;
 
 
     public function __construct($host='127.0.0.1', $port=8080,$rooms=[]) {
@@ -138,12 +134,6 @@ class my_game {
 
             case 'help':case 'h':case '?':
                 /*
-                $help = "---\r\n";
-                $help .= "This program demonstrates using sockets with a non blocking cli local interface.\r\n";
-                $help .= "You are currently viewing the local help on the server side.\r\n\n";
-                $help .= "Available commands:\r\n";
-                $help .= " test - Test command\r\n";
-                $help .= " quit - Quit the program\r\n";
                 $help .= "---\n\n";
                 $this->out($help);
                 */
@@ -165,13 +155,7 @@ class my_game {
 
     public function welcome()
     {
-        /*
-        $welcome = "\n\n";
-        $welcome .= "-- NonBlockingCLI test server (local console type ? for help) --\n";
-        $welcome .= "\n\n\n";
-
-        $this->out($welcome); // local out
-        */
+        // 
 
         // helper class (game)
         $this->c_game->welcome(); // game welcome
@@ -187,8 +171,7 @@ class my_game {
 
     public function socket_welcome($client) {
         // triggered by main loop when code requests a welcome
-        $welcome = "-- NonBlockingCLI test server --\r\n";
-        $welcome .= "Welcome to the NonBlockingCLI test server.\r\n";
+        $welcome = "";
         $welcome .= "Type 'h' or 'help' for a list of commands.\r\n";
         $welcome .= "Type 'quit' to exit.\r\n";
         $welcome .= "\r\n\n";
@@ -219,6 +202,7 @@ class my_game {
 
             // add entity (helper class)
             $entity = $this->c_entities->add();
+
             $entity->set("uid", $uid);
             $entity->set("client_key", $client_key);
             $entity->set("name", "Test Player ". rand(1,1000));
@@ -234,6 +218,8 @@ class my_game {
 
             // run client welcome
             // $this->socket_welcome($client);
+
+            # TODO: Nanny bypass probably add here?
 
             // helper class
             $this->c_game->welcome_player($entity);
@@ -667,28 +653,4 @@ class c_object
         $mud->run();
         usleep(1000);
     }
-
-
-
-    // // create another different chat server on a different port and run at same time
-    // $host = '127.0.0.1';
-    // $port = 5000;
-    // $plugin_b = new my_plugin($host, $port);
-
-
-    // create main object that controls the plugins
-    // $cli = new nb_cli();
-
-    // add plugins to main controller
-    // $cli->add_plugin($plugin_a);
-    // $cli->add_plugin($plugin_b);
-
-    // run our main controller which will run the plugins welcome() functions
-    // $cli->welcome();
-
-    // run our main controller which will run the plugins run() functions in a loop
-    // maximum speed is set in main controller, but each plugin can time their own runs
-    // $cli->run();
-
-
 ?>
