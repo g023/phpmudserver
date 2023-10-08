@@ -568,60 +568,15 @@ class game_do extends game_util {
         $spell_name = trim(strtolower($params));
 
         // if we don't have the spell in our list, output error
-        /*
-        $spell = null;
-        foreach($spells as $spell2) {
-            if($spell2['name'] == $spell_name) {
-                $spell = $spell2;
-                break;
-            }
-        }
-        */
         $spell = $this->_get_player_spell($spell_name, $entity);
-        
+
         if($spell == null) {
             $entity->out_prompt("You don't know that spell.\r\n");
             return false;
         }
 
         # now we should punt the rest to run_spell
-        $this->run_spell($spell_name, $entity); // cast <spell> on <target> = run_spell($spell, $entity, $target_entity)
-
-        // check if we have enough mp
-
-        // get spell info
-        $spell_info = $this->get_spell_info($spell_name);
-
-        // check if we have enough mp
-        $mp = $entity->get("mp");
-        if($mp < $spell_info['mp']) {
-            $entity->out_prompt("You don't have enough mana.\r\n");
-            return false;
-        }
-
-        // remove mp
-        $entity->set("mp", $mp - $spell_info['mp']);
-
-        // check if spell fails
-        $chance = $spell['chance'];
-        $rand = rand(0, 100) / 100;
-
-        if($rand > $chance) {
-            $entity->out_prompt("You fail to cast the spell.\r\n");
-            $entity->set("cooldown", time() + $spell_info['cooldown']);
-            return false;
-        }
-
-
-
-        // if spell succeeds, do spell
-
-        $entity->out("you proceed to cast ".$spell_name."\r\n");
-
-        print_r($spell_info);
-
-        // set cooldown
-        $entity->set("cooldown", time() + $spell_info['cooldown']);
+        return $this->run_spell($spell_name, $entity); // cast <spell> on <target> = run_spell($spell, $entity, $target_entity)
 
 
     }
@@ -665,12 +620,51 @@ class game_do extends game_util {
     private function run_spell($spell_name, $entity, $target_entity=null)
     {
         // TODO: throw in cooldown timer here instead of the do_* functions
-        $spell_info = $this->get_spell_info($spell_name);
         // after all checks we handle just the spell part
 
         // if spell_info['target] == 'room' apply to all in room
         // if spell_info['target] == 'individual' apply to individual
         // if isset ["dam min"] then flag as hostile so we can determine whether to start fights with affected
+
+##-- old
+        $spell      = $this->_get_player_spell($spell_name, $entity);   // entity
+        $spell_info = $this->get_spell_info($spell_name);               // global spell database
+
+        // check if we have enough mp
+        $mp = $entity->get("mp");
+        if($mp < $spell_info['mp']) {
+            $entity->out_prompt("You don't have enough mana.\r\n");
+            return false;
+        }
+
+        // remove mp
+        $entity->set("mp", $mp - $spell_info['mp']);
+
+        // check if spell fails
+        $chance = $spell['chance'];
+        $rand = rand(0, 100) / 100;
+
+        if($rand > $chance) {
+            $entity->out_prompt("You fail to cast the spell.\r\n");
+            $entity->set("cooldown", time() + $spell_info['cooldown']);
+            return false;
+        }
+
+
+
+        // if spell succeeds, do spell
+
+        $entity->out("you proceed to cast ".$spell_name."\r\n");
+
+        print_r($spell_info);
+
+        // set cooldown
+        $entity->set("cooldown", time() + $spell_info['cooldown']);
+
+
+##-- end old
+
+
 
         $hostile = false;
         if(isset($spell_info['damage']))
