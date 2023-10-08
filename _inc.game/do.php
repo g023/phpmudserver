@@ -644,9 +644,15 @@ class game_do extends game_util {
             );
         }
 
-        $entity->out("you proceed to cast ".$spell_name."\r\n");
+        // if cast messages else
+        if(isset($spell_info['cast messages']))
+            $entity->out($spell_info['cast messages'][array_rand($spell_info['cast messages'])] . "\r\n");
+        else
+            $entity->out("you proceed to cast ".$spell_name."\r\n");
 
-        print_r($spell_info);
+
+
+        // print_r($spell_info);
 
         // set cooldown
         $entity->set("cooldown", time() + $spell_info['cooldown']);
