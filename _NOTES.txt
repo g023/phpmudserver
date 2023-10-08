@@ -1,0 +1,74 @@
+TODO: detect peephole in door inventory and let player see through object to other destination if a peephole exists in inventory.
+TODO: perhaps have ability for entities/objects to make noise in nearby rooms with messages. eg) You hear a boom nearby.
+TODO: use keywords on entities instead of name. Name as fallback if no keywords.
+
+sep 25 2023
+----------
+open/close doors
+timed doors added (added a check doors loop)
+open/close handled in do_enter, do_put, do_look_in
+working on cast
+
+
+sep 26
+-------
+prepped earthquake spell for use as a global spell. Game has a spell check loop that keeps running a spell for durations.
+Spells can be targetted to room, individuals at the moment
+
+sep 27
+------
+Got up to private function run_spell where a spell actually gets processed. 
+Going to jump over to add lock, unlock mechanism for objects to compliment open/close
+
+lock/unlock : 
+	- can have multiple object ids as keys.
+	- do not specifically require a key (might just be a latch)
+	- going to skip adding timed lock/unlock to match timed open/close. Maybe handle in future.
+	- handle keycodes: keycode can be any string. User can enter 'unlock <doorname>| using (key|code) <object|keyphrase>'
+		- unlock <doorname>
+		- unlock <doorname> using key <inventory object>
+		- unlock <doorname> using code Sammiches are Yummy
+		- set code <doorname>:<keycode>
+		- set key <doorname>:<inventory object>
+
+oct 01
+------
+Updated _q_find_match($match_str, $entities)
+    - now can check for a keywords array and process for matches.
+    - so far just the objects work, but there is a number modifier that can be added to entity to search for. eg) get 2.door
+    - working on NPCs/Players to support this
+    - function do_fight($params, $entity) - routed to _q_find_match, and now you can do npc/player fight using selector eg) fight 2.npc 
+    - now have to modify other functions looking for players (maybe I have to do a function for this)
+    - finding other player is now handled by a private function: _find_other_player_in_room($name, $room_uid, $entity_uid)
+        - mirrored code of _q_find_match to handle keywords as well as names and handle numerical selectors eg) fight 2.npc
+    - do_give: modified to use _find_other_player_in_room
+    - do_fight: ditto
+
+- added keywords to door and tested against changes and seems to work on red door.
+- added keywords to random obj/npc generation
+
+oct 04
+------
+do_lock/do_unlock working
+
+oct 06
+-----
+created a key on start and attached to door
+                 set door state to locked and closed
+unlock with now working. eg) unlock door with key
+
+- began splitting up game class into sections
+- added private function _get_enemies_in_room($entity) above battle() in game class for the battle loop
+- new folder to handle split out classes that extend a core game class called _inc.game and inside it are a chain of classes that define a main game class
+- just include _inc.game/command from this folder and it should pull all the rest of the classes it extends from
+- // game_core -> game_comm -> game_help -> game_find -> game_util -> game_do -> game_command -> game
+- // _inc.game/: core.php, comm.php, help.php, find.php, util.php, do.php, command.php
+
+
+
+
+
+
+
+
+	
