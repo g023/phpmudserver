@@ -50,6 +50,42 @@ class game_core {
         }
     }
     
+    // convert 2d5+1 by rolling the dice and returning the number
+    # move to util.php
+    public function dice($str_dice)
+    {
+        $str_dice = trim($str_dice);
+        // if string is just a number return it as an int
+        if(is_numeric($str_dice))
+            return (int)$str_dice;
+        
+        // if string is a dice roll, roll it and return the number
+        if(strpos($str_dice, 'd') !== false) {
+            $total = 0;
+
+
+            $str_dice = explode('d', $str_dice);
+            $num_dice = $str_dice[0];
+            $num_sides = $str_dice[1];
+
+            // if we have a + sign in num_sides[1] then add that to total
+            if(strpos($num_sides, '+') !== false) {
+                $num_sides = explode('+', $num_sides);
+                // add to total
+                $total += (int)$num_sides[1];
+                $num_sides = $num_sides[0];
+            }
+
+            for($i = 0; $i < $num_dice; $i++) {
+                $total += rand(1, $num_sides);
+            }
+            return $total;
+            
+        }
+
+        // else just return $str_dice
+        return $str_dice;
+    }    
 
 } // end class game_core
 

@@ -4,7 +4,8 @@ include_once('find.php');
 class game_util extends game_find {
     // currently empty and just leaving for future use
     // things lke roll dice might go in here, stuff used by the do functions
-    
+
+
 }
 
 ?>

@@ -354,6 +354,25 @@ class game extends game_command {
                 if(isset($spell['spell']['loop messages']) && is_array($spell['spell']['loop messages']))
                     $this->out_room_prompt("\r\n" . $spell['spell']['loop messages'][rand(0, count($spell['spell']['loop messages']) - 1)] . "\r\n", $spell['cur room']);
 
+                // if spell is a room spell, do something
+                if($spell['spell']['target'] == 'room')
+                {
+                    // get all entities in room
+                    $entities = $this->c_entities->get_all_in_room($spell['cur room']);
+                    foreach($entities as $entity)
+                    {
+                        // if entity is not caster, do something
+                        // if($entity->get("uid") != $spell['caster uid'])
+                        // {
+                            // do damage
+                            $damage = $this->dice($spell['spell']['damage']);
+                            $entity->set("hp", $entity->get("hp") - $damage);
+                            $this->out_room_prompt("\r\n" . $entity->get("name") . " takes " . $damage . " damage.\r\n", $spell['cur room']);
+                        // }
+                    }
+                }
+
+
 
             }     
         }
