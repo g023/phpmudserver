@@ -69,6 +69,11 @@ oct 07
 -----
 sent to github
 - working on spell part in class game.do (do.php in _inc.game/ folder)
+- spells are currently rubby coded into get_spell_info($spell_name) in _inc.game/do.php
+- added a $data variable to class.game.php
+- added persistent spells
+- - first spell out the gate is earthquake: cast earthquake
+- - a spell that affects a room for a duration
 
 
 

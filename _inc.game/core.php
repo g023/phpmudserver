@@ -12,6 +12,8 @@ class game_core {
     public $c_entities;
     public $c_objects;
 
+    public $data; // ['spells'], etc
+
 
     public function expand_cardinal($dir)
     {

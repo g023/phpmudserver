@@ -222,7 +222,7 @@ class game extends game_command {
         // can use $entity->add_to("spells", $spell) to add a spell
         $entity->add_to("spells", array('name'=>'cucumber storm', 'level'=>1, 'chance'=>0.1));
         // earthquake
-        $entity->add_to("spells", array('name'=>'earthquake', 'level'=>1, 'chance'=>0.1));
+        $entity->add_to("spells", array('name'=>'earthquake', 'level'=>1, 'chance'=>0.9));
 
 
         // set equip slots (objectid has to be in inventory)
@@ -243,7 +243,128 @@ class game extends game_command {
         $this->do_loop_entity_refresh();
         $this->do_loop_battle();
         $this->do_door_check();
+        $this->do_loop_spells();
     }
+
+    private function _remove_global_spell($uid)
+    {
+        // remove spell
+        $spells = $this->data['spells'];
+        foreach($spells as $key => $spell)
+        {
+            if($spell['uid'] == $uid)
+            {
+                unset($spells[$key]);
+                $this->data['spells'] = $spells;
+                break;
+            }
+        }
+    }
+
+    public function do_loop_spells()
+    {
+        $loop_key = 5; // for $this->next_run and $this->loop_running
+        if (!isset($this->next_run[$loop_key])) {
+        $this->next_run[$loop_key] = 0.0; // initialize // example of potential values: 1 second = 1.0, 1.5 seconds = 1.5, etc.
+        $this->loop_running[$loop_key] = false;
+        }
+        if ($this->loop_running[$loop_key] || microtime(true) < $this->next_run[$loop_key]) 
+            return;
+        $this->loop_running[$loop_key] = true;
+
+        echo "spells...\r\n";
+        // do:
+        // $data['spells'] would contain a list of currently running spells
+        // such as earthquake or some summoned monster, etc.
+        // loop through each spell, grab its info, and do something
+
+        // get all spells currently running
+        if(!empty($this->data['spells']) && is_array($this->data['spells']))
+        {
+            foreach($this->data['spells'] as $spell)
+            {
+                /*
+
+    [name] => earthquake
+    [duration] => 25
+    [freq] => 1
+    [time] => 1696740786
+    [expires] => 1696740811
+    [spell] => Array
+        (
+            [uid] => 652235b0a0a0f
+            [name] => Earthquake
+            [mp] => 2
+            [damage] => 2d4+1
+            [target] => room
+            [cooldown] => 25
+            [cast messages] => Array
+                (
+                    [0] => You begin to chant.
+                    [1] => You raise your hands to the sky.
+                    [2] => You slam your hands into the ground.
+                )
+
+            [cast other messages] => Array
+                (
+                    [0] => begins to chant.
+                    [1] => raises their hands to the sky.
+                    [2] => slams their hands into the ground.
+                )
+
+            [loop messages] => Array
+                (
+                    [0] => The ground shakes and trembles.
+                    [1] => The earth rumbles.
+                    [2] => The ground shakes violently.
+                )
+
+            [duration] => 25
+            [freq] => 1
+        )
+
+    [player_spell_info] => Array
+        (
+            [name] => earthquake
+            [level] => 1
+            [chance] => 0.9
+        )
+
+    [cur room] => 652235a5c7e9c
+    [caster uid] => 652235af2e357
+)                
+                */
+                // print_r($spell);
+                echo "\r\n\r\n\r\n";
+                
+                // if spell is expired, remove it
+                if($spell['expires'] < time())
+                {
+                    // check for an end message and process it
+                    if(isset($spell['spell']['end messages']) && is_array($spell['spell']['end messages']))
+                        $this->out_room_prompt("\r\n" . $spell['spell']['end messages'][rand(0, count($spell['spell']['end messages']) - 1)] . "\r\n", $spell['cur room']);
+
+                    // remove spell
+                    echo "removing global spell\r\n";
+                    $this->_remove_global_spell($spell['uid']);
+                    continue;
+                }
+
+                // output to room a message from the spell if it has one
+                if(isset($spell['spell']['loop messages']) && is_array($spell['spell']['loop messages']))
+                    $this->out_room_prompt("\r\n" . $spell['spell']['loop messages'][rand(0, count($spell['spell']['loop messages']) - 1)] . "\r\n", $spell['cur room']);
+
+
+            }     
+        }
+ 
+
+        $this->next_run[$loop_key]      = microtime(true) + 5.0; // 1 second = 1.0, 1.5 seconds = 1.5, etc.
+        $this->loop_running[$loop_key] = false;
+    }
+
+
+    
 
     public function do_loop_entity_refresh()
     {

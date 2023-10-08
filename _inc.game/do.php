@@ -477,16 +477,23 @@ class game_do extends game_util {
         // find more data on spells
         // todo: add a keywords field
         $spells['heal'] = array(
-            'name'=>'Heal Light Wounds', 'mp'=>1, 
+            'name'=>'Heal Light Wounds', 
+            'mp'=>1, 
             'cure min'=>10, 'cure max'=>10, 
             'target'=>'individual',
             'cooldown' => 25.0, // seconds
         );
+
         $spells['earthquake'] = array(
-            'name'=>'Earthquake', 'mp'=>2, 
+            'name'=>'Earthquake', 
+            'mp'=>2, 
             'damage' => '2d4+1',
             'target'=>'room',
             'cooldown' => 25.0, // seconds
+            'cast messages' =>          [   'You begin to chant.', 'You raise your hands to the sky.', 'You slam your hands into the ground.'   ],
+            'cast other messages' =>    [   'begins to chant.', 'raises their hands to the sky.', 'slams their hands into the ground.'          ],
+            'loop messages' =>          [   'The ground shakes and trembles.', 'The earth rumbles.', 'The ground shakes violently.'             ],
+            'end messages' =>           [   'The ground stops shaking.', 'The earth stops rumbling.', 'The ground stops shaking violently.'    ],
 
             // todo: make a global array
             // check for duration and freq to see if we are at our limit for room
@@ -495,7 +502,7 @@ class game_do extends game_util {
             // perhaps do away with experience points and just have spells and abilities you can purchase or earn through quests.
             // each spell starts at 5% chance to cast. The more you use it, the stronger that ability/spell gets.
             // need a spell loop to manage the list of currently running spells
-            'duration' => 5.0, // seconds
+            'duration' => 10.0, // seconds
             'freq' => 1.0, // seconds
 
         );
@@ -654,14 +661,29 @@ class game_do extends game_util {
 
         // if spell succeeds, do spell
 
+        // if it is a room spell, add it to $this->data['spells'] array
+        if($spell_info['target'] == 'room') {
+            $this->data['spells'][] = array(
+                'uid' => uniqid(),
+                'name' => $spell_name,
+                'duration' => $spell_info['duration'],
+                'freq' => $spell_info['freq'],
+                'time' => time(),
+                'expires' => time() + $spell_info['duration'],
+                'spell' => $spell_info,
+                'player_spell_info' => $spell,
+                'cur room' => $entity->get("cur room"),
+                'caster uid' => $entity->get("uid"),
+                //'caster' => $entity,
+            );
+        }
+
         $entity->out("you proceed to cast ".$spell_name."\r\n");
 
         print_r($spell_info);
 
         // set cooldown
         $entity->set("cooldown", time() + $spell_info['cooldown']);
-
-
 ##-- end old
 
 
