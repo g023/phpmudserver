@@ -65,6 +65,10 @@ unlock with now working. eg) unlock door with key
 - // _inc.game/: core.php, comm.php, help.php, find.php, util.php, do.php, command.php
 
 
+oct 07
+-----
+sent to github
+- working on spell part in class game.do (do.php in _inc.game/ folder)
 
 
 

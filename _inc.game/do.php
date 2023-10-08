@@ -404,7 +404,7 @@ class game_do extends game_util {
                 $entity->out_prompt("Unlocking this item requires a key.\r\n");
                 return false;
             }
-            
+
             $this->_player_lockunlock_obj($the_obj, $entity, false);
         } else {
             $entity->out_prompt("You don't see that here.\r\n");
@@ -515,22 +515,31 @@ class game_do extends game_util {
         
     }
 
+    private function _get_player_spell($spell_name, $entity)
+    {
+        // return a reference to the spell from player's spell list
+        // if spell not found, return false
+        $spells = $entity->get("spells");
+
+        $spell = null;
+        foreach($spells as $spell2) {
+            if($spell2['name'] == $spell_name) {
+                $spell = $spell2;
+                break;
+            }
+        }
+        return $spell;
+    }
+
     public function do_cast($params,$entity)
     {
         // note: enchant would be a good item affect version of this
         // cast <spell name>
         // case <spell name> on <npc/player>
         // if empty params, output error
+       
         if($params == '') {
             $entity->out_prompt("Cast what?\r\n");
-            return false;
-        }
-
-        // see if user can do spell 
-        $spells = $entity->get("spells");
-        //         $spells[] = array('name'=>'heal', 'level'=>1, 'chance'=>0.1);
-        if($spells == false) {
-            $entity->out_prompt("You don't know any spells.\r\n");
             return false;
         }
 
@@ -541,6 +550,16 @@ class game_do extends game_util {
             return false;
         }
 
+        // see if user can do spell 
+        $spells = $entity->get("spells");
+
+        //         $spells[] = array('name'=>'heal', 'level'=>1, 'chance'=>0.1);
+        if($spells == false) {
+            $entity->out_prompt("You don't know any spells.\r\n");
+            return false;
+        }
+
+        # ---
         // check for on, and if we have it, send to do_cast_on
         if(strpos(strtolower($params), ' on ') !== false) {
             return $this->do_cast_on($params, $entity);
@@ -549,6 +568,7 @@ class game_do extends game_util {
         $spell_name = trim(strtolower($params));
 
         // if we don't have the spell in our list, output error
+        /*
         $spell = null;
         foreach($spells as $spell2) {
             if($spell2['name'] == $spell_name) {
@@ -556,12 +576,16 @@ class game_do extends game_util {
                 break;
             }
         }
+        */
+        $spell = $this->_get_player_spell($spell_name, $entity);
+        
         if($spell == null) {
             $entity->out_prompt("You don't know that spell.\r\n");
             return false;
         }
 
         # now we should punt the rest to run_spell
+        $this->run_spell($spell_name, $entity); // cast <spell> on <target> = run_spell($spell, $entity, $target_entity)
 
         // check if we have enough mp
 
