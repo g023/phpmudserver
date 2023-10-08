@@ -370,7 +370,11 @@ class game extends game_command {
                             $this->out_room_prompt("\r\n" . $entity->get("name") . " takes " . $damage . " damage.\r\n", $spell['cur room']);
                             // check if _undertaker is needed
                             if($entity->get("hp") <= 0)
+                            {
+                                // output
+                                $entity->out_prompt("\r\nYou have died.\r\n");
                                 $this->_undertaker($entity);
+                            }
                         // }
                     }
                 }
