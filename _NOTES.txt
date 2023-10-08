@@ -74,6 +74,7 @@ sent to github
 - added persistent spells
 - - first spell out the gate is earthquake: cast earthquake
 - - a spell that affects a room for a duration
+- added _undertaker function to handle cleaning up
 
 
 

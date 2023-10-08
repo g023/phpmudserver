@@ -368,6 +368,9 @@ class game extends game_command {
                             $damage = $this->dice($spell['spell']['damage']);
                             $entity->set("hp", $entity->get("hp") - $damage);
                             $this->out_room_prompt("\r\n" . $entity->get("name") . " takes " . $damage . " damage.\r\n", $spell['cur room']);
+                            // check if _undertaker is needed
+                            if($entity->get("hp") <= 0)
+                                $this->_undertaker($entity);
                         // }
                     }
                 }
@@ -595,6 +598,16 @@ class game extends game_command {
         }
     } // end battle()
 
+    private function _undertaker($entity)
+    {
+        $this->out_other_room_prompt($entity->get("name") . " has perished.\r\n", $entity);
+
+       // drop all
+       $this->do_drop_all('', $entity);
+       // set undertaker
+       $entity->set("undertaker", true);
+    }
+
     private function do_battle_round($entity1, $entity2)
     {
         $cur_room = $entity1->get("cur room");
@@ -621,27 +634,14 @@ class game extends game_command {
             $entity1->out_prompt("You have died.\r\n");
             $entity2->out_prompt($entity1->get("name") . " has died by your hands.\r\n");
 
-            $this->out_other_room_prompt($entity1->get("name") . " has perished.\r\n",
-             $entity1);
-
-            // drop all
-            $this->do_drop_all('', $entity1);
-            // set undertaker
-            $entity1->set("undertaker", true);
+            $this->_undertaker($entity1);
         }
 
         if($entity2->get("hp") <= 0) {
             $entity2->out_prompt("You have died.\r\n");
             $entity1->out_prompt($entity2->get("name") . " has died by your hands.\r\n");
 
-            $this->out_other_room_prompt($entity2->get("name") . " has perished.\r\n",
-             $entity2);
-
-             // drop all
-            $this->do_drop_all('', $entity2);
-
-            // set undertaker
-            $entity2->set("undertaker", true); // right now handled in mud.php
+            $this->_undertaker($entity2);
         }
 
     } // end do_battle_round
