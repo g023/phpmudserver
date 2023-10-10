@@ -378,9 +378,6 @@ class game extends game_command {
                         // }
                     }
                 }
-
-
-
             }     
         }
  
